@@ -91,12 +91,44 @@ hourlywageData <- subset(lfsData,
 
 hourlywageData$Statistics <- "Median hourly wage"
 
-# LAD data for poverty entrance and exit rates
 
+# LAD data for poverty entrance and exit rates
+ladData <- subset(read.csv("working_data/LAD_1110002401_databaseLoadingData.csv", head=TRUE, sep=","), 
+                  select=c(REF_DATE, GEO, Selected.characteristics, Statistics, VALUE),
+                  Selected.characteristics != "Both sexes")
+
+ladData$Sex <- ifelse(ladData$Selected.characteristics %in% c("Males", "Females"), 
+                      as.character(ladData$Selected.characteristics), 
+                      "Both sexes") 
+
+ladData$Age.group <- ifelse(ladData$Selected.characteristics %in% c("Males", "Females", "Total, 18 years and over"),
+                            "All age groups",
+                            as.character(ladData$Selected.characteristics))
+
+ladData$GEO <- revalue(ladData$GEO, c("Newfoundland and Labrador" = "NL", "Prince Edward Island" = "PE",
+                                      "Nova Scotia" = "NS", "New Brunswick" = "NB", "Quebec" ="QC",
+                                      "Ontario" = "ON", "Manitoba" ="MB", "Saskatchewan" = "SK", "Alberta" = "AB",
+                                      "British Columbia" = "BC"))
+
+ladData$Age.group <- revalue(ladData$Age.group, c("65 years and above" = "65 years and over"))
+
+ladData$Age.group <- factor(ladData$Age.group, levels=c("All age groups", 
+                                                        "18 to 24 years", 
+                                                        "25 to 54 years",
+                                                        "55 to 64 years",
+                                                        "65 years and over"))
+
+ladData$Sex <- factor(ladData$Sex, levels=c("Both sexes", 
+                                            "Males", 
+                                            "Females"))
+
+ladData$Selected.characteristics <- NULL
+
+ladData <- dplyr::rename(ladData, Year = REF_DATE)
 
 
 # combine final data sources
-finalData <- rbind(officialrateData, gapratioData, relativelowincData, hourlywageData)
+finalData <- rbind(officialrateData, gapratioData, relativelowincData, hourlywageData, ladData)
 write.csv(finalData, file="data/finalData.csv", na="",row.names = F)
 
 
