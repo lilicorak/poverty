@@ -13,76 +13,77 @@ library(ggiraph)
 library(maps)
 
 data <- read.csv("data/finalData.csv", head=T, sep=",")
-data$Age.group <- factor(data$Age.group, levels=c("All age groups", 
-                                                                  "Under 18 years", 
-                                                                  "18 to 64 years",
-                                                                  "65 years and over"))
+data$Age.group <- factor(data$Age.group, levels=c("All age groups", "Under 18 years", "15 to 24 years", "18 to 24 years",
+                                                  "25 to 54 years", "55 to 64 years", "18 to 64 years",
+                                                  "55 years and over", "65 years and over"))
+data$Sex <- factor(data$Sex, levels = c("Both sexes", "Males", "Females"))
 
 
 ui <- fluidPage(theme=shinytheme("paper"),
-  titlePanel("Interactive Poverty Dashboard"),
-  sidebarLayout(
-    sidebarPanel(
-      width = 2,
-      selectInput("year", 
-                  label = "Year of interest:",
-                  choices = c(2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006),
-                  selected = 2018),
-      selectInput("geo",
-                  label = "Geography:",
-                  choices = c("Canada" = "Canada", "Newfoundland and Labrador" = "NL", "Prince Edward Island" = "PEI",
-                              "Nova Scotia" = "NS", "New Brunswick" = "NB", "Quebec" ="QC",
-                              "Ontario" = "ON", "Manitoba" ="MB", "Saskatchewan" = "SK", "Alberta" = "AB",
-                              "British Columbia" = "BC", "Yukon" = "YT", "Northwest Territories" = "NT",
-                              "Nunavut" = "NU"),
-                  selected = "Canada"),
-      selectInput("age",
-                  label = "Age group:",
-                  choices = c("All age groups", "Under 18 years", "18 to 64 years", "65 years and over"),
-                  selected = "All age groups"),
-      selectInput("sex",
-                  label = "Sex:",
-                  choices = c("Both sexes", "Males", "Females"),
-                  selected = "Both sexes")
-    ),
-    mainPanel(
-      width = 10,
-      tabsetPanel(
-        tabPanel(h6("Official poverty rate"),
-                 fluidRow(style="display: flex; align-items: center;",
-                   column(5, girafeOutput("officialMap")),
-                   column(7, selectInput("officialByVar", 
-                                         label = "By variable(s):",
-                                         choices = c("None" = "Statistics",
-                                                     "Age group" = "Age.group",
-                                                     "Sex"),
-                                         selected = "Statistics"),
-                              plotOutput("officialYears"))
-                 ),
-                 fluidRow(
-                   column(4, plotOutput("officialAge")),
-                   column(4, plotOutput("officialSex")),
-                   column(4, wellPanel(p(em("Canada's Poverty Reduction Strategy"), 
-                                         " introduces the Official Poverty Line for Canada along with the Dashboard of 
-                                         12 indicators to track progress on poverty reduction for Canadians and their households."),
-                                       p("The ", em("Poverty Reduction Strategy")," sets an official measure of poverty: the Market Basket Measure as 
-                                         Canada's Official Poverty Line, based on the cost of a basket of goods and services that individuals 
-                                         and families require to meet their basic needs and achieve a modest standard of living in communities 
-                                         across the country (ESDC, 2018).")))
-                 )),
-        tabPanel(h6("Dignity"),
-                 p("This isn't ready yet. Check back later!"),
-                 p("There will be info on deep income, unmet health needs ...")),
-        tabPanel(h6("Opportunity and inclusion"),
-                 p("This isn't ready yet. Check back later!"),
-                 p("There will be info on relative low income, youth engagement, literacy ...")),
-        tabPanel(h6("Resilience and security"),
-                 p("This isn't ready yet. Check back later!"),
-                 p("There will be info on median hourly wage, poverty gap ..."))
-      )
-    )
-  )
-)
+                titlePanel("Interactive Poverty Dashboard"),
+                tabsetPanel(
+                  tabPanel(h6("Official poverty rate"), br(),
+                           sidebarLayout(
+                             sidebarPanel(
+                               width = 2,
+                               selectInput("year", 
+                                           label = "Year of interest:",
+                                           choices = c("2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006"),
+                                           selected = "2018"),
+                               selectInput("geo",
+                                           label = "Geography:",
+                                           choices = c("Canada" = "Canada", "Newfoundland and Labrador" = "NL", "Prince Edward Island" = "PE",
+                                                       "Nova Scotia" = "NS", "New Brunswick" = "NB", "Quebec" ="QC",
+                                                       "Ontario" = "ON", "Manitoba" ="MB", "Saskatchewan" = "SK", "Alberta" = "AB",
+                                                       "British Columbia" = "BC", "Yukon" = "YT", "Northwest Territories" = "NT",
+                                                       "Nunavut" = "NU"),
+                                           selected = "Canada"),
+                               selectInput("age",
+                                           label = "Age group:",
+                                           choices = c("All age groups", "Under 18 years", "18 to 64 years", "65 years and over"),
+                                           selected = "All age groups"),
+                               selectInput("sex",
+                                           label = "Sex:",
+                                           choices = c("Both sexes", "Males", "Females"),
+                                           selected = "Both sexes")
+                             ),
+                             mainPanel(
+                               width = 10,
+                               fluidRow(style="display: flex; align-items: center;",
+                                        column(5, girafeOutput("officialMap")),
+                                        column(7, selectInput("officialByVar", 
+                                                              label = "By variable(s):",
+                                                              choices = c("None" = "Statistics",
+                                                                          "Age group" = "Age.group",
+                                                                          "Sex"),
+                                                              selected = "Statistics"),
+                                               plotOutput("officialYears"))
+                                ),
+                               fluidRow(
+                                 column(4, plotOutput("officialAge")),
+                                 column(4, plotOutput("officialSex")),
+                                 column(4, wellPanel(p(em("Canada's Poverty Reduction Strategy"), 
+                                                       " introduces the Official Poverty Line for Canada along with the Dashboard of 
+                                                           12 indicators to track progress on poverty reduction for Canadians and their households."),
+                                                     p("The ", em("Poverty Reduction Strategy")," sets an official measure of poverty: the Market Basket Measure as 
+                                                           Canada's Official Poverty Line, based on the cost of a basket of goods and services that individuals 
+                                                           and families require to meet their basic needs and achieve a modest standard of living in communities 
+                                                           across the country (ESDC, 2018).")))
+                                )
+                               )
+                           )),
+                           
+                           tabPanel(h6("Dignity"),
+                                    p("This isn't ready yet. Check back later!"),
+                                    p("There will be info on deep income, unmet health needs ...")),
+                           tabPanel(h6("Opportunity and inclusion"),
+                                    p("This isn't ready yet. Check back later!"),
+                                    p("There will be info on relative low income, youth engagement, literacy ...")),
+                           tabPanel(h6("Resilience and security"),
+                                    p("This isn't ready yet. Check back later!"),
+                                    p("There will be info on median hourly wage, poverty gap ..."))
+                  )
+                )
 
 officialByVarVec <- c("None" = "Statistics",
                       "Age group" = "Age.group",
@@ -141,7 +142,8 @@ server <- function(input, output) {
       theme_classic() + 
       {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
       scale_y_continuous(limits = c(0,NA)) + 
-      scale_x_continuous(breaks = seq(from=min(officialYearsData$Year), to=max(officialYearsData$Year))) + 
+      scale_x_discrete(labels = seq(from=min(as.numeric(as.character(officialYearsData$Year))), 
+                                    to=max(as.numeric(as.character(officialYearsData$Year))))) + 
       geom_label_repel(data=subset(officialYearsData, Year == input$year),
                        aes(x=Year, y=VALUE, label=VALUE), point.padding = 0.7, min.segment.length = 0) + 
       labs(y="Official poverty rate (%)", 
