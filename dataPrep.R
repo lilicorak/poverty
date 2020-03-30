@@ -35,6 +35,8 @@ cisData$Age.group <- factor(cisData$Age.group, levels=c("All age groups",
                                                         "18 to 64 years",
                                                         "65 years and over"))
 
+cisData <- subset(cisData, select = -c(Persons.in.low.income))
+
 cisData <- dplyr::rename(cisData, Year = REF_DATE)
 
 
@@ -75,14 +77,26 @@ lfsData$GEO <- revalue(lfsData$GEO, c("Newfoundland and Labrador" = "NL", "Princ
                        "Ontario" = "ON", "Manitoba" ="MB", "Saskatchewan" = "SK", "Alberta" = "AB",
                        "British Columbia" = "BC"))
 
-lfsData <- dplyr::rename(lfsData, Statistics = Wages, Year = REF_DATE)
+lfsData$Age.group <- revalue(lfsData$Age.group, c("15 years and over" = "All age groups"))
+
+lfsData$Age.group <- factor(lfsData$Age.group, levels=c("All age groups", 
+                                                        "15 to 24 years", 
+                                                        "25 to 54 years",
+                                                        "55 years and over"))
+
+lfsData <- dplyr::rename(lfsData, Year = REF_DATE)
+
+hourlywageData <- subset(lfsData,
+                         select = -c(Wages, Type.of.work))
+
+hourlywageData$Statistics <- "Median hourly wage"
 
 # LAD data for poverty entrance and exit rates
 
 
 
 # combine final data sources
-finalData <- rbind(officialrateData, gapratioData, relativelowincData)
+finalData <- rbind(officialrateData, gapratioData, relativelowincData, hourlywageData)
 write.csv(finalData, file="data/finalData.csv", na="",row.names = F)
 
 
