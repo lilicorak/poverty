@@ -22,7 +22,7 @@ data$Sex <- factor(data$Sex, levels = c("Both sexes", "Males", "Females"))
 ui <- fluidPage(theme=shinytheme("paper"),
                 titlePanel("Interactive Poverty Dashboard"),
                 tabsetPanel(
-                  tabPanel(h6("Official poverty rate"), br(),
+                  tabPanel(h5("Official poverty rate"), br(),
                            sidebarLayout(
                              sidebarPanel(
                                width = 2,
@@ -73,17 +73,50 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                )
                            )),
                            
-                           tabPanel(h6("Dignity"),
-                                    p("This isn't ready yet. Check back later!"),
-                                    p("There will be info on deep income, unmet health needs ...")),
-                           tabPanel(h6("Opportunity and inclusion"),
-                                    p("This isn't ready yet. Check back later!"),
-                                    p("There will be info on relative low income, youth engagement, literacy ...")),
-                           tabPanel(h6("Resilience and security"),
-                                    p("This isn't ready yet. Check back later!"),
-                                    p("There will be info on median hourly wage, poverty gap ..."))
-                  )
+                  tabPanel(h5("Dignity"),
+                           tabsetPanel(
+                             tabPanel(strong("Overview"),
+                                      p("This isn't ready yet. Check back later!"),
+                                      p("There will be info on deep income, unmet health needs ...")),
+                             tabPanel(strong("Deep Income"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Unmet housing needs"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Unmet health needs"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Food insecurity"),
+                                      p("This isn't ready yet. Check back later!"))
+                           )),
+                  tabPanel(h5("Opportunity and inclusion"),
+                           tabsetPanel(
+                             tabPanel(strong("Overview"),
+                                      p("This isn't ready yet. Check back later!"),
+                                      p("There will be info on deep income, unmet health needs ...")),
+                             tabPanel(strong("Relative low income"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Bottom 40 percent income share"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Youth engagement"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Literacy and numeracy"),
+                                      p("This isn't ready yet. Check back later!"))
+                           )),
+                  tabPanel(h5("Resilience and security"),
+                           tabsetPanel(
+                             tabPanel(strong("Overview"),
+                                      p("This isn't ready yet. Check back later!"),
+                                      p("There will be info on deep income, unmet health needs ...")),
+                             tabPanel(strong("Median hourly wage"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Average poverty gap"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Asset resilience"),
+                                      p("This isn't ready yet. Check back later!")),
+                             tabPanel(strong("Poverty entry and exit rates"),
+                                      p("This isn't ready yet. Check back later!"))
+                           ))
                 )
+)
 
 officialByVarVec <- c("None" = "Statistics",
                       "Age group" = "Age.group",
@@ -142,8 +175,6 @@ server <- function(input, output) {
       theme_classic() + 
       {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
       scale_y_continuous(limits = c(0,NA)) + 
-      scale_x_discrete(labels = seq(from=min(as.numeric(as.character(officialYearsData$Year))), 
-                                    to=max(as.numeric(as.character(officialYearsData$Year))))) + 
       geom_label_repel(data=subset(officialYearsData, Year == input$year),
                        aes(x=Year, y=VALUE, label=VALUE), point.padding = 0.7, min.segment.length = 0) + 
       labs(y="Official poverty rate (%)", 
