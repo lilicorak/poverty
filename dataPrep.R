@@ -2,6 +2,8 @@ library(tidyverse)
 library(reshape2)
 library(plyr)
 
+# test change
+
 # CIS dataset with official poverty rate, average poverty gap, and relative low income measure
 cisData <- subset(read.csv("working_data/CIS_1110013501_databaseLoadingData.csv", head=TRUE, sep=","), 
                   select=c(REF_DATE, GEO, Low.income.lines, Persons.in.low.income, Statistics, VALUE))
