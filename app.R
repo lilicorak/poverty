@@ -1,5 +1,5 @@
 # install.packages(c("rsconnect", "shiny", "ggplot2", "scales", "shinythemes", "tidyverse", 
-#                    "mapcan", "ggsci", "ggrepel", "ggiraph"))
+#                    "mapcan", "ggsci", "ggrepel", "ggiraph", "plotly))
 
 library(rsconnect)
 library(shiny)
@@ -11,6 +11,7 @@ library(ggsci)
 library(ggrepel)
 library(ggiraph)
 library(maps)
+library(plotly)
 
 data <- read.csv("data/finalData.csv", head=T, sep=",")
 data$Age.group <- factor(data$Age.group, levels=c("All age groups", "Under 18 years", "15 to 24 years", "18 to 24 years",
@@ -58,11 +59,12 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                                    "Age group" = "Age.group",
                                                                                    "Sex"),
                                                                        selected = "Statistics"),
-                                                        plotOutput("officialYears"))
+                                                            girafeOutput("officialYears"))
                                         ),
+                                        br(),
                                         fluidRow(
-                                          column(4, plotOutput("officialAge")),
-                                          column(4, plotOutput("officialSex")),
+                                          column(4, girafeOutput("officialAge")),
+                                          column(4, girafeOutput("officialSex")),
                                           column(4, wellPanel(p(em("Canada's Poverty Reduction Strategy"), 
                                                                 " introduces the Official Poverty Line for Canada along with the Dashboard of 
                                                            12 indicators to track progress on poverty reduction for Canadians and their households."),
@@ -150,7 +152,7 @@ server <- function(input, output) {
 
   })
   
-  output$officialYears <- renderPlot({
+  output$officialYears <- renderGirafe({
     officialYearsData <- if (input$officialByVar == "Statistics") subset(data, Statistics == "Official poverty rate" &
                                                                               Sex == input$sex &
                                                                               Age.group == input$age &
@@ -164,18 +166,20 @@ server <- function(input, output) {
                                                                      Sex != "Both sexes" &
                                                                      GEO == input$geo)
     
-    ggplot(officialYearsData) + 
-      geom_line(aes(x=Year, y=VALUE, colour=get(input$officialByVar), group=get(input$officialByVar)), size=1.5) + 
-      scale_colour_jco() +
-      theme_classic() + 
-      {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
-      scale_y_continuous(limits = c(0,NA)) + 
-      geom_label_repel(data=subset(officialYearsData, Year == input$year),
-                       aes(x=Year, y=VALUE, label=VALUE), point.padding = 0.7, min.segment.length = 0) + 
-      labs(y="Official poverty rate (%)", 
-           x="Year", 
-           colour = names(officialByVarVec)[officialByVarVec == input$officialByVar],
-           title=paste("Official poverty rate by year")) 
+    officialYearsPlot <- ggplot(officialYearsData) + 
+                          geom_line(aes(x=Year, y=VALUE, colour=get(input$officialByVar), group=get(input$officialByVar)), size=1) +
+                          geom_point_interactive(aes(x=Year, y=VALUE, tooltip=paste0(Year, ": ", VALUE, "%"), 
+                                                     colour=get(input$officialByVar), group=get(input$officialByVar)), size = 2) +
+                          scale_colour_jco() +
+                          theme_classic() + 
+                          {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
+                          scale_y_continuous(limits = c(0,NA)) + 
+                          labs(y="Official poverty rate (%)", 
+                               x="Year", 
+                               colour = names(officialByVarVec)[officialByVarVec == input$officialByVar],
+                               title=paste("Official poverty rate by year")) 
+      
+      girafe(ggobj = officialYearsPlot)
     
   })
   
@@ -187,16 +191,18 @@ server <- function(input, output) {
                   Year == input$year &
                   Statistics == "Official poverty rate"))})
   
-  output$officialSex <- renderPlot({
+  output$officialSex <- renderGirafe({
     
-    ggplot(officialSexData()) + 
-      geom_col(aes(x=Sex, y=VALUE, alpha = highlight, fill=Statistics)) + 
-      theme_classic() + scale_fill_jco() +
-      scale_alpha(range = c(max(0.45, min(officialSexData()$highlight)),1)) +
-      guides(alpha = FALSE, fill=FALSE) +
-      labs(y="Official poverty rate (%)", 
-           x="Sex", 
-           title=paste("Official poverty rate (%) by sex,",input$year))
+    officialSexPlot <- ggplot(officialSexData()) + 
+                        geom_col_interactive(aes(x=Sex, y=VALUE, alpha = highlight, fill=Statistics, tooltip=paste0(VALUE,"%"))) + 
+                        theme_classic() + scale_fill_jco() +
+                        scale_alpha(range = c(max(0.45, min(officialSexData()$highlight)),1)) +
+                        guides(alpha = FALSE, fill=FALSE) +
+                        labs(y="Official poverty rate (%)", 
+                             x="Sex", 
+                             title=paste("Official poverty rate (%) by sex,",input$year))
+    
+    girafe(ggobj = officialSexPlot)
   })
   
   officialAgeData <- reactive ({data$highlight <- ifelse((data$Age.group == input$age), 1, ifelse((input$age == "All age groups"),1,0))
@@ -207,16 +213,19 @@ server <- function(input, output) {
                   Year == input$year &
                   Statistics == "Official poverty rate"))})
   
-  output$officialAge <- renderPlot({
+  output$officialAge <- renderGirafe({
     
-    ggplot(officialAgeData()) + 
-      geom_col(aes(x=Age.group, y=VALUE, fill=Statistics, alpha = highlight)) + 
-      theme_classic() + scale_fill_jco() +
-      scale_alpha(range = c(max(0.45, min(officialAgeData()$highlight)),1)) +
-      guides(alpha = FALSE, fill = FALSE) +
-      labs(y="Official poverty rate (%)", 
-           x="Age group", 
-           title=paste("Official poverty rate (%) by age group,",input$year))
+    officialAgePlot <- ggplot(officialAgeData()) + 
+                        geom_col_interactive(aes(x=Age.group, y=VALUE, alpha = highlight, fill=Statistics, tooltip=paste0(VALUE,"%"))) + 
+                        theme_classic() + scale_fill_jco() +
+                        scale_alpha(range = c(max(0.45, min(officialAgeData()$highlight)),1)) +
+                        guides(alpha = FALSE, fill = FALSE) +
+                        labs(y="Official poverty rate (%)", 
+                             x="Age group", 
+                             title=paste("Official poverty rate (%) by age group,",input$year))
+    
+    girafe(ggobj = officialAgePlot)
+
   })
   
 }
