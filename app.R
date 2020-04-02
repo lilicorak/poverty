@@ -1,5 +1,5 @@
 # install.packages(c("rsconnect", "shiny", "ggplot2", "scales", "shinythemes", "tidyverse", 
-#                    "mapcan", "ggsci", "ggrepel", "ggiraph", "plotly))
+#                    "mapcan", "ggsci", "ggrepel", "ggiraph", "plotly"))
 
 library(rsconnect)
 library(shiny)
@@ -62,7 +62,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                             girafeOutput("officialYears"))
                                         ),
                                         br(),
-                                        fluidRow(
+                                        fluidRow(style="display: flex; align-items: center;",
                                           column(4, girafeOutput("officialAge")),
                                           column(4, girafeOutput("officialSex")),
                                           column(4, wellPanel(p(em("Canada's Poverty Reduction Strategy"), 
@@ -171,7 +171,7 @@ server <- function(input, output) {
                           geom_point_interactive(aes(x=Year, y=VALUE, tooltip=paste0(Year, ": ", VALUE, "%"), 
                                                      colour=get(input$officialByVar), group=get(input$officialByVar)), size = 2) +
                           scale_colour_jco() +
-                          theme_classic() + 
+                          theme_classic() + theme(text=element_text(family="Roboto"), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
                           {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
                           scale_y_continuous(limits = c(0,NA)) + 
                           labs(y="Official poverty rate (%)", 
@@ -195,7 +195,7 @@ server <- function(input, output) {
     
     officialSexPlot <- ggplot(officialSexData()) + 
                         geom_col_interactive(aes(x=Sex, y=VALUE, alpha = highlight, fill=Statistics, tooltip=paste0(VALUE,"%"))) + 
-                        theme_classic() + scale_fill_jco() +
+                        theme_classic() + scale_fill_jco() + theme(text=element_text(family="Roboto")) +
                         scale_alpha(range = c(max(0.45, min(officialSexData()$highlight)),1)) +
                         guides(alpha = FALSE, fill=FALSE) +
                         labs(y="Official poverty rate (%)", 
@@ -217,7 +217,7 @@ server <- function(input, output) {
     
     officialAgePlot <- ggplot(officialAgeData()) + 
                         geom_col_interactive(aes(x=Age.group, y=VALUE, alpha = highlight, fill=Statistics, tooltip=paste0(VALUE,"%"))) + 
-                        theme_classic() + scale_fill_jco() +
+                        theme_classic() + scale_fill_jco() + theme(text=element_text(family="Roboto")) +
                         scale_alpha(range = c(max(0.45, min(officialAgeData()$highlight)),1)) +
                         guides(alpha = FALSE, fill = FALSE) +
                         labs(y="Official poverty rate (%)", 
