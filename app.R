@@ -171,7 +171,7 @@ server <- function(input, output) {
                           geom_point_interactive(aes(x=Year, y=VALUE, tooltip=paste0(Year, ": ", VALUE, "%"), 
                                                      colour=get(input$officialByVar), group=get(input$officialByVar)), size = 2) +
                           scale_colour_jco() +
-                          theme_classic() + theme(text=element_text(family="Roboto"), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+                          theme_classic() + theme(text=element_text(family="Roboto"), plot.margin=grid::unit(c(0,0,0,0), "mm"),legend.position = "bottom") +
                           {if (input$officialByVar != "Statistics") guides(colour = "legend") else guides(colour=F)} +
                           scale_y_continuous(limits = c(0,NA)) + 
                           labs(y="Official poverty rate (%)", 
