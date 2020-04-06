@@ -148,7 +148,7 @@ server <- function(input, output) {
                           text=element_text(family="Roboto")) +
                     scale_fill_material("blue", name="Official poverty rate")
     
-    girafe(ggobj = officialMapPlot)
+    girafe(ggobj = officialMapPlot, width_svg = 5)
 
   })
   
@@ -179,7 +179,7 @@ server <- function(input, output) {
                                colour = names(officialByVarVec)[officialByVarVec == input$officialByVar],
                                title=paste("Official poverty rate by year")) 
       
-      girafe(ggobj = officialYearsPlot)
+      girafe(ggobj = officialYearsPlot, width_svg = 9)
     
   })
   
