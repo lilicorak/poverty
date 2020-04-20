@@ -458,9 +458,6 @@ server <- function(input, output, session) {
                                     "By sex" = "Sex"),
                         selected = "Statistics")
     }
-    
-   
-    
   })
 
   ######### opportunity and inclusion page
